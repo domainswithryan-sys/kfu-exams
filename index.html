@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KFU Cairo — Online Exams</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#ffffff; --ink:#1c2430; --muted:#6b7686; --border:#dfe4ea;
+    --accent:#2f6fed; --accent-ink:#ffffff; --radius:14px;
+    --shadow:0 1px 3px rgba(20,30,50,.08), 0 8px 24px rgba(20,30,50,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161c; --card:#1b2129; --ink:#e9edf2; --muted:#96a1b0; --border:#2c333d;
+      --accent:#5b8cf7; --accent-ink:#0b1220;
+    }
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding:calc(24px + env(safe-area-inset-top,0px)) 16px calc(40px + env(safe-area-inset-bottom,0px));
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  h1{font-size:24px;margin:0 0 4px;}
+  p.lead{color:var(--muted);margin:0 0 24px;font-size:14px;}
+  .exam-card{
+    display:block;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:18px 20px;margin-bottom:14px;text-decoration:none;color:inherit;
+    transition:transform .15s;
+  }
+  .exam-card:hover{transform:translateY(-2px);border-color:var(--accent);}
+  .exam-card .subject{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+  .exam-card .title{font-size:17px;font-weight:700;margin-bottom:4px;}
+  .exam-card .meta{font-size:12.5px;color:var(--muted);}
+  .empty{color:var(--muted);font-size:14px;padding:30px 0;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>KFU Cairo — Online Exams</h1>
+  <p class="lead">Select your exam below. Make sure you have your Student ID ready before starting — the timer begins immediately.</p>
+  <div id="list"></div>
+</div>
+<script>
+// ---- Add a new exam here whenever you publish one ----
+// path must match the file under /exams/, without ".html" (clean URLs are enabled)
+const EXAMS = [
+  {
+    subject: "Biochemistry",
+    title: "Carbohydrate Chemistry — Comprehensive Examination",
+    path: "/exams/carbohydrate-chemistry",
+    meta: "128 questions · 168 points · 120 minutes"
+  }
+  // { subject: "...", title: "...", path: "/exams/...", meta: "..." },
+];
+
+const list = document.getElementById("list");
+if(EXAMS.length===0){
+  list.innerHTML = '<div class="empty">No exams published yet.</div>';
+} else {
+  list.innerHTML = EXAMS.map(e => `
+    <a class="exam-card" href="${e.path}">
+      <div class="subject">${e.subject}</div>
+      <div class="title">${e.title}</div>
+      <div class="meta">${e.meta}</div>
+    </a>
+  `).join("");
+}
+</script>
+</body>
+</html>
