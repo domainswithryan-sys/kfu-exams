@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carbohydrate Chemistry — Online Exam</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#ffffff; --ink:#1c2430; --muted:#6b7686; --border:#dfe4ea;
+    --accent:#2f6fed; --accent-ink:#ffffff; --good:#1f9d55; --bad:#e2483d; --warn:#e2a13d;
+    --radius:14px; --shadow:0 1px 3px rgba(20,30,50,.08), 0 8px 24px rgba(20,30,50,.06);
+    font-size:16px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#12161c; --card:#1b2129; --ink:#e9edf2; --muted:#96a1b0; --border:#2c333d;
+      --accent:#5b8cf7; --accent-ink:#0b1220;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#12161c; --card:#1b2129; --ink:#e9edf2; --muted:#96a1b0; --border:#2c333d;
+    --accent:#5b8cf7; --accent-ink:#0b1220;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-padding-top:calc(70px + env(safe-area-inset-top,0px));}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  .wrap{max-width:820px;margin:0 auto;padding:16px 16px 80px;}
+  .topbar{
+    position:sticky; top:0; z-index:20; background:var(--card); border-bottom:1px solid var(--border);
+    padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;
+  }
+  .topbar-inner{max-width:820px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .brand{font-weight:700;font-size:15px;}
+  .brand small{display:block;font-weight:400;color:var(--muted);font-size:12px;}
+  .timer{
+    font-variant-numeric:tabular-nums; font-weight:800; font-size:20px; padding:6px 14px;
+    border-radius:999px; background:var(--bg); border:1px solid var(--border);
+  }
+  .timer.warn{color:var(--warn); border-color:var(--warn);}
+  .timer.bad{color:var(--bad); border-color:var(--bad); animation:pulse 1s infinite;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .progress-outer{height:6px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:10px;}
+  .progress-inner{height:100%;background:var(--accent);width:0%;transition:width .25s;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin:16px 0;}
+  h1{font-size:22px;margin:0 0 4px;}
+  h2{font-size:18px;margin:0 0 12px;}
+  p.lead{color:var(--muted);margin:4px 0 0;font-size:14px;}
+  label{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px;font-weight:600;}
+  input[type=text],input[type=number],select,textarea{
+    width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;
+    background:var(--bg);color:var(--ink);font-size:15px;font-family:inherit;
+  }
+  textarea{min-height:110px;resize:vertical;}
+  .btn{
+    appearance:none;border:none;cursor:pointer;font-weight:700;font-size:15px;
+    padding:12px 20px;border-radius:10px;background:var(--accent);color:var(--accent-ink);
+  }
+  .btn.secondary{background:transparent;color:var(--accent);border:1px solid var(--accent);}
+  .btn.block{width:100%;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .row{display:flex;gap:10px;flex-wrap:wrap;}
+  .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-top:12px;}
+  .tab{
+    flex:0 0 auto;padding:8px 14px;border-radius:999px;border:1px solid var(--border);
+    background:var(--bg);color:var(--ink);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;
+  }
+  .tab.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);}
+  .tab .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);margin-inline-end:6px;}
+  .tab.done .dot{background:var(--good);}
+  .tab.locked{opacity:.45;cursor:not-allowed;}
+  .tab.future{opacity:.35;cursor:not-allowed;}
+  .tab .mins{opacity:.75;font-weight:500;margin-inline-start:4px;}
+  .q{border-top:1px solid var(--border);padding:16px 0;}
+  .q:first-child{border-top:none;padding-top:4px;}
+  .q-num{font-weight:700;color:var(--accent);font-size:13px;margin-bottom:4px;}
+  .q-text{font-size:15px;margin-bottom:10px;line-height:1.5;}
+  .opt{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:7px;cursor:pointer;font-size:14px;}
+  .opt:hover{border-color:var(--accent);}
+  .opt input{margin-top:3px;flex:0 0 auto;}
+  .opt.selected{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 10%, var(--card));}
+  .opt.disabled{cursor:not-allowed;opacity:.7;}
+  .q-collapsed{border-top:1px solid var(--border);padding:11px 0;display:flex;align-items:center;gap:10px;}
+  .q-collapsed:first-child{border-top:none;}
+  .q-collapsed .q-num{margin-bottom:0;flex:0 0 auto;}
+  .q-collapsed .q-collapsed-text{flex:1;font-size:13.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .q-collapsed .q-collapsed-ans{flex:0 0 auto;font-size:13.5px;font-weight:700;color:var(--good);max-width:40%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .q-collapsed .edit-btn{flex:0 0 auto;background:none;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;color:var(--accent);cursor:pointer;}
+  .section-banner{display:flex;align-items:center;justify-content:space-between;gap:10px;background:color-mix(in srgb, var(--warn) 14%, var(--card));border:1px solid var(--warn);border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:13.5px;}
+  .section-banner button{flex:0 0 auto;}
+  .toast{
+    position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);
+    background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:10px;font-size:13.5px;font-weight:600;
+    box-shadow:var(--shadow);z-index:50;opacity:0;transition:opacity .25s, transform .25s;pointer-events:none;max-width:90vw;text-align:center;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .tf-row{display:flex;gap:10px;}
+  .tf-row .opt{flex:1;justify-content:center;text-align:center;}
+  .match-term{font-size:14px;margin-bottom:6px;font-weight:600;}
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:8px;}
+  @media (max-width:560px){.match-grid{grid-template-columns:1fr;}}
+  .match-col-title{font-weight:800;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  .match-a-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--border);font-size:13.5px;}
+  .match-a-row span{flex:1;line-height:1.35;}
+  .match-a-row .match-blank{
+    width:40px !important;flex:0 0 auto;text-align:center;text-transform:lowercase;font-weight:800;
+    padding:7px 0 !important;border:1.5px solid var(--border);border-radius:8px;background:var(--bg);color:var(--accent);font-size:15px;
+  }
+  .match-a-row .match-blank:focus{outline:none;border-color:var(--accent);}
+  .match-a-row .match-blank.filled{border-color:var(--accent);}
+  .match-b-item{padding:6px 0;border-bottom:1px dashed var(--border);font-size:13px;line-height:1.4;color:var(--ink);}
+  .match-b-item b{color:var(--accent);margin-right:4px;}
+  .foot-nav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;}
+  .muted{color:var(--muted);font-size:13px;}
+  .score-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0;}
+  @media (min-width:520px){.score-grid{grid-template-columns:repeat(3,1fr);}}
+  .score-box{border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;}
+  .score-box .n{font-size:22px;font-weight:800;}
+  .score-box .l{font-size:12px;color:var(--muted);margin-top:2px;}
+  .review-item{border-top:1px solid var(--border);padding:12px 0;font-size:13.5px;}
+  .badge{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;}
+  .badge.ok{background:color-mix(in srgb, var(--good) 18%, transparent);color:var(--good);}
+  .badge.no{background:color-mix(in srgb, var(--bad) 18%, transparent);color:var(--bad);}
+  .badge.mid{background:color-mix(in srgb, var(--warn) 18%, transparent);color:var(--warn);}
+  .hidden{display:none !important;}
+  .center{text-align:center;}
+  .small{font-size:12px;color:var(--muted);}
+  table.simple{width:100%;border-collapse:collapse;font-size:13px;}
+  table.simple td,table.simple th{border:1px solid var(--border);padding:6px 8px;text-align:left;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand" id="brandTitle">Loading exam…<small id="brandSub"></small></div>
+    <div style="text-align:right">
+      <div class="timer" id="timerBox">--:--:--</div>
+      <div class="small" id="timerLabel" style="margin-top:4px"></div>
+      <div class="small" id="integrityBadge" style="color:var(--warn);font-weight:700;margin-top:2px"></div>
+    </div>
+  </div>
+  <div class="progress-outer" id="progWrapOuter"><div class="progress-inner" id="progInner"></div></div>
+</div>
+<div id="toast" class="toast"></div>
+
+<div class="wrap">
+
+  <!-- START SCREEN -->
+  <div class="card" id="startScreen">
+    <h1 id="startTitle"></h1>
+    <p class="lead" id="startSub"></p>
+    <table class="simple" style="margin-top:14px" id="sectionTable"></table>
+    <label>Student Name</label>
+    <input type="text" id="studentName" placeholder="Full name">
+    <label>Student ID</label>
+    <input type="text" id="studentId" placeholder="ID number">
+    <p class="muted" style="margin-top:14px">Once you start, the timer begins and cannot be paused. If you close this tab, your answers and remaining time are saved on this device — reopen the same link to resume.</p>
+  <p class="muted" style="margin-top:6px">This exam will try to enter fullscreen mode. Exiting fullscreen, switching tabs/windows, and copy/paste are logged and included in your results file for your instructor's review.</p>
+    <button class="btn block" id="startBtn" style="margin-top:14px">Start Exam</button>
+  </div>
+
+  <!-- EXAM SCREEN -->
+  <div id="examScreen" class="hidden">
+    <div class="tabs" id="tabs"></div>
+    <div class="card" id="sectionCard"></div>
+    <div id="footArea"></div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen" class="hidden">
+    <div class="card">
+      <h1>Exam Submitted</h1>
+      <p class="lead" id="resultsWho"></p>
+      <div class="score-grid" id="scoreGrid"></div>
+      <p class="small" id="resultsNote"></p>
+      <div class="row" style="margin-top:16px">
+        <button class="btn" id="downloadBtn">Download Results File</button>
+        <button class="btn secondary" id="printBtn">Print Summary</button>
+      </div>
+      <p class="small" style="margin-top:10px">Send the downloaded results file to your instructor.</p>
+    </div>
+    <div class="card" id="integrityCard">
+      <h2>Integrity Signals</h2>
+      <p class="muted" id="integritySummary"></p>
+      <div id="integrityLog"></div>
+    </div>
+    <div class="card" id="reviewCardE">
+      <h2>Section E — Suggested grading (for instructor review)</h2>
+      <div id="reviewE"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const EXAM = {"meta":{"university":"KAZAN FEDERAL UNIVERSITY IN CAIRO","course":"Biochemistry — 2025-2026","title":"CARBOHYDRATE CHEMISTRY — Comprehensive Examination","totalPoints":168,"totalQuestions":128,"defaultMinutes":120,"sectionMinutes":{"A":15,"B":10,"C":10,"D":15,"E":30},"storageId":"carb_chem_v1"},"A":[[1,"Carbohydrates are chemically defined as:",["Complex molecules composed of more than 10 monosaccharide units","Molecules formed by replacing the OH group of the 2nd carbon with an amino group","Polyhydroxy aldehydes or polyhydroxy ketones and their derivatives","Structures that are mirror images of each other"],2,2],[2,"Which of the following is an example of an aldohexose?",["D-Fructose","D-Xylose","D-Ribose","D-Glucose"],3,3],[3,"Fructose is an example of:",["A ketotriose","An aldohexose","An aldopentose","A ketohexose"],3,3],[4,"According to products of hydrolysis, how many monosaccharide units does a disaccharide yield?",["More than 10","3-10","1","2"],3,4],[5,"According to products of hydrolysis, oligosaccharides yield how many units?",["2","1","3-10","More than 10"],2,4],[6,"Which type of carbohydrate is described as 'the simplest form' and yields only 1 unit on hydrolysis?",["Disaccharides","Monosaccharides","Oligosaccharides","Polysaccharides"],1,4],[7,"Monosaccharides are classified according to which two criteria?",["Solubility and molecular weight","Number of carbon atoms and functional group","Source (plant or animal) and taste","Digestibility and the enzyme required"],1,6],[8,"A triose contains how many carbon atoms?",["6","3","5","4"],1,6],[9,"A pentose contains how many carbon atoms?",["4","3","6","5"],3,6],[10,"Aldoses contain which functional group?",["Carboxyl group (COOH)","Ketone group (CO)","Amino group (NH2)","Aldehyde group (CHO)"],3,6],[11,"Glyceraldehyde is classified as:",["A ketotriose","An aldopentose","An aldotriose","An aldotetrose"],2,7],[12,"Erythrose is classified as:",["An aldohexose","A ketopentose","An aldotriose","An aldotetrose"],3,7],[13,"Ribose is classified as:",["An aldohexose","An aldopentose","A ketopentose","An aldotetrose"],1,7],[14,"Ribulose is classified as:",["An aldopentose","An aldohexose","A ketopentose","An aldotriose"],2,7],[15,"Which of the following is a ketotriose?",["Glyceraldehyde","Erythrose","Dihydroxyacetone","Ribose"],2,7],[16,"Galactose, like glucose, is classified as:",["A ketohexose","A ketopentose","An aldohexose","An aldopentose"],2,7],[17,"Stereoisomers are best defined as:",["Complex carbohydrates composed of more than 10 monosaccharide units","Structures with the same structural formula that differ in the arrangement of atoms in 3D space","Structures formed by replacing an OH group with an amino group","Structures that have different structural formulas but similar properties"],1,8],[18,"A chiral carbon atom is defined as:",["A carbon atom that has four different groups attached","A carbon atom found only in polysaccharides","A carbon atom bonded to two identical groups","A carbon atom bonded to an amino group"],0,8],[19,"D-glucose and L-glucose are examples of:",["Sugar acids","Amino sugars","Homopolysaccharides","Enantiomers"],3,8],[20,"Which of the following is NOT listed as a monosaccharide derivative category?",["Sugar acids","Sugar alcohols","Deoxy sugars","Disaccharides"],3,9],[21,"2-deoxy-ribose is a sugar that is present in:",["Cellulose","DNA","RNA","Starch"],1,10],[22,"The sugar alcohol derived from glucose is:",["Mannitol","Sorbitol","Glucosamine","Xylitol"],1,11],[23,"The sugar alcohol derived from mannose is:",["Mannitol","Sorbitol","Galactosamine","Xylitol"],0,11],[24,"The sugar alcohol derived from xylose is:",["Xylitol","Mannitol","Gluconic acid","Sorbitol"],0,11],[25,"Which sugar alcohol is described as the most popular due to its similarity to sucrose in appearance and sweetness?",["Sorbitol","Mannitol","Xylitol","Dextrin"],2,12],[26,"Compared to sucrose, sugar alcohols:",["Contain fewer calories","Contain more calories","Contribute more to tooth decay","Are metabolized by oral bacteria"],0,12],[27,"Gluconic acid and glucuronic acid are examples of:",["Deoxy sugars","Sugar alcohols","Sugar acids","Amino sugars"],2,13],[28,"Sugar acids enter in the structure of:",["Glycosaminoglycans (GAGs)","Glycogen","Cellulose","Starch"],0,13],[29,"In amino sugars, the OH group of which carbon is replaced by an amino group (NH2)?",["The 4th carbon","The 6th carbon","The 1st carbon","The 2nd carbon"],3,14],[30,"Which of the following are examples of amino sugars?",["Starch and glycogen","Glucosamine and galactosamine","Sorbitol and mannitol","Gluconic acid and glucuronic acid"],1,14],[31,"Lactose is formed of:",["D-galactose and D-fructose","D-glucose and D-galactose","D-glucose and D-glucose","D-glucose and D-fructose"],1,16],[32,"Maltose is formed of:",["D-Glucose + D-Glucose","D-glucose and D-galactose","D-glucose and D-fructose","D-fructose and D-fructose"],0,16],[33,"Sucrose is formed of:",["D-glucose and D-galactose","D-galactose and D-galactose","D-Glucose + D-Glucose","D-glucose and D-fructose"],3,16],[34,"The enzyme that hydrolyzes lactose is:",["Lactase","Amylase","Sucrase","Maltase"],0,16],[35,"The enzyme that hydrolyzes sucrose is:",["Sucrase","Amylase","Lactase","Maltase"],0,16],[36,"Lactose intolerance is caused by:",["The inability to digest lactose (milk sugar)","The inability to digest sucrose","The inability to digest starch","The inability to digest cellulose"],0,17],[37,"Lactose intolerance is due to a deficiency of which enzyme?",["Sucrase","Amylase","Lactase","Maltase"],2,17],[38,"Which of the following is listed as a symptom of lactose intolerance?",["Increased calorie absorption","Flatulence","Improved digestion","Constipation"],1,18],[39,"Undigested lactose is metabolized by:",["Intestinal bacteria","Pancreatic lipase","Salivary amylase","Liver enzymes"],0,19],[40,"The gases and short chain fatty acids that cause lactose intolerance symptoms result from:",["Lactose being broken down by amylase","Lactose being absorbed directly into the blood","Undigested lactose being metabolized by intestinal bacteria","Lactose being converted directly to glycogen"],2,19],[41,"Polysaccharides are complex carbohydrates composed of:",["Exactly 10 monosaccharide units","3-10 monosaccharide units","2 monosaccharide units","More than 10 monosaccharide units"],3,20],[42,"Polysaccharides are classified into which two categories?",["Aldoses and ketoses","Deoxy sugars and amino sugars","Homopolysaccharides and heteropolysaccharides","Monosaccharides and disaccharides"],2,21],[43,"Which of the following is classified as a homopolysaccharide?",["Starch","Glycosaminoglycans (GAGs)","Glucosamine","Gluconic acid"],0,22],[44,"Glycosaminoglycans (GAGs) are classified as:",["Monosaccharides","Heteropolysaccharides","Homopolysaccharides","Disaccharides"],1,22],[45,"Starch is the storage form of carbohydrates in:",["Animals","Plants","Bacteria","Fungi"],1,23],[46,"In starch, the D-glucose units at the branch points are linked by:",["β-1,4-glycosidic bonds","α 1,6 glucosidic bonds","α 1,4 glucosidic bonds","β-1,6-glycosidic bonds"],1,23],[47,"Starch is hydrolyzed by amylase enzyme into:",["Lactose and galactose","Glucose and fructose","Maltose and dextrin","Sucrose and glucose"],2,23],[48,"The main storage form of glucose in humans is:",["Glycogen","Starch","Sucrose","Cellulose"],0,24],[49,"Cellulose is composed of long chains of glucose molecules linked by:",["β-1,6-glycosidic bonds","α 1,6 glucosidic bonds","α 1,4 glucosidic bonds","β-1,4-glycosidic bonds"],3,25],[50,"Dietary fibers (cellulose) help prevent constipation by:",["Adding bulk to stool, which stimulates the intestinal wall","Binding to water-soluble vitamins","Increasing lactase secretion","Decreasing bulk in the stool"],0,26]],"B":[[1,"Carbohydrates are organic molecules that are polyhydroxy aldehydes or polyhydroxy ketones and their derivatives.",true,2,""],[2,"Fructose is classified as an aldohexose.",false,3,"Fructose is a ketohexose, not an aldohexose."],[3,"Oligosaccharides yield 3-10 units upon hydrolysis.",true,4,""],[4,"Polysaccharides yield exactly 10 units upon hydrolysis.",false,4,"Polysaccharides yield more than 10 units upon hydrolysis."],[5,"Hexoses contain 6 carbon atoms.",true,6,""],[6,"Ketoses contain an aldehyde group (CHO).",false,6,"Ketoses contain a ketone group (CO); aldoses contain the aldehyde group (CHO)."],[7,"Ribose is classified as an aldopentose.",true,7,""],[8,"Dihydroxyacetone is classified as an aldotriose.",false,7,"Dihydroxyacetone is a ketotriose, not an aldotriose."],[9,"A chiral carbon atom has four different groups attached.",true,8,""],[10,"D-glucose and L-glucose are examples of homopolysaccharides.",false,8,"D-glucose and L-glucose are examples of enantiomers."],[11,"Monosaccharide derivatives include deoxy sugars, sugar alcohols, sugar acids, and amino sugars.",true,9,""],[12,"2-deoxy-ribose is present in DNA.",true,10,""],[13,"Mannose's corresponding sugar alcohol is sorbitol.",false,11,"Mannose's sugar alcohol is mannitol; sorbitol is derived from glucose."],[14,"Sugar alcohols contain fewer calories than sucrose.",true,12,""],[15,"Sugar alcohols are metabolized by oral bacteria and contribute to tooth decay.",false,12,"Sugar alcohols are NOT metabolized by oral bacteria and do NOT contribute to tooth decay."],[16,"Sugar acids, such as gluconic acid and glucuronic acid, enter in the structure of starch.",false,13,"Sugar acids enter in the structure of glycosaminoglycans (GAGs), not starch."],[17,"In amino sugars, the OH group of the 1st carbon is replaced by an amino group.",false,14,"It is the OH group of the 2nd carbon that is replaced by an amino group (NH2)."],[18,"Sucrose is formed of D-glucose and D-fructose.",true,16,""],[19,"Maltose is hydrolyzed by the enzyme lactase.",false,16,"Maltose is hydrolyzed by maltase, not lactase."],[20,"Lactose intolerance is due to lactase deficiency.",true,17,""],[21,"Constipation is listed as a symptom of lactose intolerance.",false,18,"Diarrhea (not constipation), along with cramps and flatulence, is a symptom of lactose intolerance."],[22,"Undigested lactose is metabolized by intestinal bacteria, producing gases and short chain fatty acids.",true,19,""],[23,"Polysaccharides are composed of more than 10 monosaccharide units.",true,20,""],[24,"Starch is hydrolyzed by amylase enzyme into glucose and fructose.",false,23,"Starch is hydrolyzed by amylase into maltose and dextrin, not glucose and fructose."],[25,"Cellulose is indigestible by humans due to the lack of enzymes needed to break the β-linkages.",true,25,""]],"C":{"set1":{"title":"Monosaccharide Classification & Derivatives (items 1–10)","terms":[[1,"Glyceraldehyde",9,7],[2,"Erythrose",5,7],[3,"Ribose",8,7],[4,"Glucose",4,6],[5,"Dihydroxyacetone",3,7],[6,"Sorbitol",2,11],[7,"Mannitol",0,11],[8,"Xylitol",1,11],[9,"Glucosamine",7,14],[10,"2-deoxy-ribose",6,10]],"options":["The sugar alcohol derived from mannose.","The sugar alcohol derived from xylose; popular as an artificial sweetener similar to sucrose.","The sugar alcohol derived from glucose.","A ketotriose (3-carbon sugar with a ketone group).","An aldohexose (6-carbon sugar) containing an aldehyde group.","An aldotetrose (4-carbon sugar).","A deoxy sugar present in DNA.","An amino sugar formed by replacing the OH group of the 2nd carbon with an amino group (NH2).","An aldopentose (5-carbon sugar).","An aldotriose (3-carbon sugar), classified by number of carbon atoms."]},"set2":{"title":"Disaccharides, Polysaccharides & Digestive Concepts (items 11–20)","terms":[[11,"Lactose",7,16],[12,"Maltose",5,16],[13,"Sucrose",6,16],[14,"Starch",4,23],[15,"Glycogen",8,24],[16,"Cellulose",0,25],[17,"Glycosaminoglycans (GAGs)",2,13],[18,"Lactase",3,17],[19,"Amylase",9,23],[20,"Dietary fiber (cellulose)",1,26]],"options":["Found in plants only as dietary fiber; linked by β-1,4-glycosidic bonds and indigestible by humans.","Protects against cancer by binding to toxic compounds in the diet and decreasing their absorption.","A heteropolysaccharide; sugar acids and amino sugars enter into its structure.","The enzyme that is deficient in lactose intolerance.","The storage form of carbohydrates in plants, hydrolyzed by amylase into maltose and dextrin.","Formed of D-Glucose + D-Glucose; known as malt sugar.","Formed of D-glucose and D-fructose; known as cane sugar, table sugar, or sugar of beets.","Formed of D-glucose and D-galactose; known as milk sugar.","The main storage form of glucose in humans, found in the liver and muscles.","The enzyme that hydrolyzes starch into maltose and dextrin."]}},"D":[[21,"Carbohydrates are ______ molecules that are polyhydroxy aldehydes or polyhydroxy ketones.","organic",2,[]],[22,"D-Glucose is an example of an ______.","aldohexose",3,[]],[23,"D-Fructose is an example of a ______.","ketohexose",3,[]],[24,"Monosaccharides yield ______ unit(s) upon hydrolysis, making them the simplest form.","1",4,["one"]],[25,"Disaccharides yield ______ units upon hydrolysis.","2",4,["two"]],[26,"A tetrose contains ______ carbon atoms.","4",6,["four"]],[27,"A hexose contains ______ carbon atoms.","6",6,["six"]],[28,"Aldoses contain an aldehyde group, abbreviated ______.","CHO",6,[]],[29,"Ketoses contain a ketone group, abbreviated ______.","CO",6,[]],[30,"______ is an example of a ketopentose.","Ribulose",7,[]],[31,"Most monosaccharides contain at least one ______ carbon and can form stereoisomers.","chiral",8,[]],[32,"______ are stereoisomers that are mirror images, like D-glucose and L-glucose.","Enantiomers",8,[]],[33,"Monosaccharide derivatives include deoxy sugars, sugar alcohols, sugar acids, and ______.","amino sugars",9,[]],[34,"Xylose's corresponding sugar alcohol is ______.","Xylitol",11,[]],[35,"Sugar alcohols are commonly used in place of table sugar, which is also known as ______.","sucrose",12,[]],[36,"Examples of amino sugars include glucosamine and ______.","galactosamine",14,[]],[37,"Lactose is hydrolyzed by the enzyme ______.","lactase",16,[]],[38,"Maltose is hydrolyzed by the enzyme ______.","maltase",16,[]],[39,"Lactose intolerance is due to ______ deficiency.","lactase",17,[]],[40,"Lactose intolerance symptoms include cramps, flatulence, and ______.","diarrhea",18,[]],[41,"Polysaccharides are classified into homopolysaccharides and ______.","heteropolysaccharides",21,[]],[42,"Starch is present in large amounts in cereals, tubers, and ______ (e.g. beans).","legumes",23,[]],[43,"In starch, D-glucose units are linked together by ______ glucosidic bonds.","α 1,4",23,["alpha 1,4","a 1,4","alpha1,4"]],[44,"Liver glycogen supplies glucose to other tissues through ______.","blood",24,[]],[45,"Dietary fibers can absorb ______ times their own weight in water.","5-10",26,["5 to 10","five to ten"]]],"E":[[46,"Describe how carbohydrates are classified according to the products of hydrolysis, including the number of units yielded by each class.",[["Monosaccharides yield 1 unit; they are the simplest form.",["monosaccharide","1 unit","simplest"]],["Disaccharides yield 2 units.",["disaccharide","2 unit"]],["Oligosaccharides yield 3-10 units.",["oligosaccharide","3-10"]],["Polysaccharides yield more than 10 units.",["polysaccharide","more than 10","10 units"]],["This classification is based on the products of hydrolysis.",["hydrolysis"]],["All 4 classes (mono-, di-, oligo-, polysaccharides) together make up this classification.",["four","4 classes"]]],"p.4"],[47,"Describe how monosaccharides are classified according to the number of carbon atoms, giving one example of each.",[["Trioses have 3 carbon atoms (e.g., glyceraldehyde).",["triose","glyceraldehyde"]],["Tetroses have 4 carbon atoms (e.g., erythrose).",["tetrose","erythrose"]],["Pentoses have 5 carbon atoms (e.g., ribose).",["pentose","ribose"]],["Hexoses have 6 carbon atoms (e.g., glucose or fructose).",["hexose","glucose","fructose"]],["This classification is based on the number of carbon atoms.",["carbon atom","number of carbon"]],["Monosaccharides are also classified according to their functional group (aldoses vs ketoses).",["aldose","ketose","functional group"]]],"p.6-7"],[48,"Define stereoisomers, chiral carbon, and enantiomers, giving an example.",[["Stereoisomers = structures with the same structural formula that differ in the arrangement of atoms in 3D space.",["stereoisomer","arrangement"]],["Most monosaccharides contain at least one chiral carbon.",["chiral carbon"]],["Most monosaccharides can therefore form stereoisomers.",["form stereoisomer"]],["A chiral carbon atom is a carbon atom that has 4 different groups attached.",["four different","4 different"]],["Enantiomers = stereoisomers that are mirror images of each other.",["enantiomer","mirror image"]],["D-glucose and L-glucose are an example of enantiomers.",["d-glucose","l-glucose"]]],"p.8"],[49,"List and briefly describe the 4 types of monosaccharide derivatives, with one example of each.",[["Deoxy sugars — e.g. 2-deoxy-ribose, present in DNA.",["deoxy sugar","2-deoxy-ribose","dna"]],["Sugar alcohols — e.g. sorbitol (from glucose), mannitol (from mannose), or xylitol (from xylose).",["sugar alcohol","sorbitol","mannitol","xylitol"]],["Sugar acids — e.g. gluconic acid or glucuronic acid.",["sugar acid","gluconic","glucuronic"]],["Amino sugars — formed by replacing the OH of the 2nd carbon with NH2; e.g. glucosamine or galactosamine.",["amino sugar","glucosamine","galactosamine"]],["Sugar acids enter in the structure of glycosaminoglycans (GAGs).",["gag","glycosaminoglycan"]],["Amino sugars also enter in the structure of glycosaminoglycans (GAGs).",["gag","glycosaminoglycan","amino sugar"]]],"p.9-14"],[50,"Describe the 3 disaccharides mentioned, their monosaccharide components, their common names, and the enzymes that hydrolyze them.",[["Lactose = D-glucose + D-galactose; known as milk sugar.",["lactose","galactose","milk sugar"]],["Lactose is hydrolyzed by lactase.",["lactase"]],["Maltose = D-Glucose + D-Glucose; known as malt sugar.",["maltose","malt sugar"]],["Maltose is hydrolyzed by maltase.",["maltase"]],["Sucrose = D-glucose + D-fructose; known as cane sugar, table sugar, or sugar of beets.",["sucrose","fructose","cane sugar","table sugar"]],["Sucrose is hydrolyzed by sucrase.",["sucrase"]]],"p.16"],[51,"Explain the biochemical basis of lactose intolerance and list its symptoms.",[["Lactose digestion requires the action of the enzyme lactase.",["lactase"]],["Lactose intolerance is caused by the inability to digest lactose (milk sugar).",["inability to digest","lactose intolerance"]],["This is due to lactase deficiency.",["lactase deficiency"]],["Undigested lactose is metabolized by intestinal bacteria.",["intestinal bacteria"]],["This produces gases and short chain fatty acids that cause the symptoms.",["gases","short chain fatty acid"]],["Symptoms include cramps, flatulence, and diarrhea.",["cramps","flatulence","diarrhea"]]],"p.17-19"],[52,"Compare starch, glycogen, and cellulose in terms of function/location and the type of glucosidic bonds linking their units.",[["Starch is the storage form of carbohydrates in plants, linked by α 1,4 (and α 1,6 at branch points) glucosidic bonds.",["starch","plant","1,4"]],["Glycogen is the main storage form of glucose in humans (liver and muscles).",["glycogen","liver","muscle"]],["Cellulose is found in plants only, as dietary fiber.",["cellulose","dietary fiber"]],["Cellulose is linked by β-1,4-glycosidic bonds.",["β-1,4","beta 1,4","beta-1,4"]],["Cellulose is indigestible by humans due to the lack of enzymes needed to break the β-linkages.",["indigestible","lack of enzyme"]],["Starch, glycogen, and cellulose are all classified as homopolysaccharides.",["homopolysaccharide"]]],"p.22-25"],[53,"Explain how dietary fiber (cellulose) benefits digestive health.",[["Cellulose is a major component of dietary fiber, important for digestive health.",["cellulose","dietary fiber"]],["Dietary fibers prevent constipation.",["constipation"]],["They add bulk to stool, which stimulates the intestinal wall.",["bulk","stool","intestinal wall"]],["They can absorb 5-10 times their own weight in water.",["5-10","water"]],["This water is drained into the intestinal lumen, increasing bowel movement.",["bowel movement"]],["They protect against cancer by binding to toxic compounds in the diet, decreasing their absorption.",["cancer","toxic","bind"]]],"p.26"]]};
+const STORAGE_KEY = "kfu_exam_" + (EXAM.meta.storageId || "default");
+const SECTION_MIN = EXAM.meta.sectionMinutes || {A:15,B:10,C:10,D:15,E:30};
+const TABS = ["A","B","C","D","E"];
+const TAB_LABELS = {A:"A · MCQ",B:"B · T/F",C:"C · Matching",D:"D · Fill Blank",E:"E · Short Answer"};
+const totalMinutesAll = TABS.reduce((s,t)=>s+(SECTION_MIN[t]||0),0);
+
+function el(id){return document.getElementById(id);}
+function esc(s){return String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+// Runtime-only: question numbers in Section A the student re-opened for editing
+// (not persisted — a fresh page load always shows the compact/collapsed view).
+const expandedA = new Set();
+
+// ---------- State ----------
+let state = loadState() || {
+  started:false, submitted:false, name:"", sid:"",
+  activeSection:"A", sectionStartTime:null,
+  lockedSections:{},
+  answers:{A:{},B:{},C1:{},C2:{},D:{},E:{}},
+  currentTab:"A",
+  order:null, optOrder:null,
+  violations:{fullscreenExits:0, tabSwitches:0, windowBlurs:0, log:[]}
+};
+
+function shuffledIndices(len){
+  const arr = Array.from({length:len}, (_,i)=>i);
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]] = [arr[j],arr[i]];
+  }
+  return arr;
+}
+function buildPerStudentOrder(){
+  const order = {
+    A: shuffledIndices(EXAM.A.length),
+    B: shuffledIndices(EXAM.B.length),
+    D: shuffledIndices(EXAM.D.length),
+    E: shuffledIndices(EXAM.E.length),
+    C1terms: shuffledIndices(EXAM.C.set1.terms.length),
+    C1opts: shuffledIndices(EXAM.C.set1.options.length),
+    C2terms: shuffledIndices(EXAM.C.set2.terms.length),
+    C2opts: shuffledIndices(EXAM.C.set2.options.length)
+  };
+  const optOrder = {A:{}, B:{}};
+  EXAM.A.forEach(row => { optOrder.A[row[0]] = shuffledIndices(row[2].length); });
+  EXAM.B.forEach(row => { optOrder.B[row[0]] = Math.random()<0.5; });
+  return {order, optOrder};
+}
+
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+
+let toastTimer=null;
+function showToast(msg){
+  const t = el("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove("show"), 4000);
+}
+
+// ---------- Setup / Start screen ----------
+el("brandTitle").innerHTML = esc(EXAM.meta.title) + "<small>"+esc(EXAM.meta.university)+" · "+esc(EXAM.meta.course)+"</small>";
+el("startTitle").textContent = EXAM.meta.title;
+el("startSub").textContent = EXAM.meta.university + " — " + EXAM.meta.course + " · " + EXAM.meta.totalQuestions + " questions, " + EXAM.meta.totalPoints + " points, " + totalMinutesAll + " minutes total.";
+el("sectionTable").innerHTML = `<tr><th>Section</th><th>Type</th><th>Questions</th><th>Points</th><th>Time</th></tr>
+<tr><td>A</td><td>Multiple Choice</td><td>${EXAM.A.length}</td><td>${EXAM.A.length}</td><td>${SECTION_MIN.A} min</td></tr>
+<tr><td>B</td><td>True / False</td><td>${EXAM.B.length}</td><td>${EXAM.B.length}</td><td>${SECTION_MIN.B} min</td></tr>
+<tr><td>C</td><td>Matching</td><td>${EXAM.C.set1.terms.length+EXAM.C.set2.terms.length}</td><td>${EXAM.C.set1.terms.length+EXAM.C.set2.terms.length}</td><td>${SECTION_MIN.C} min</td></tr>
+<tr><td>D</td><td>Fill in the Blank</td><td>${EXAM.D.length}</td><td>${EXAM.D.length}</td><td>${SECTION_MIN.D} min</td></tr>
+<tr><td>E</td><td>Short Answer</td><td>${EXAM.E.length}</td><td>${EXAM.E.length*6}</td><td>${SECTION_MIN.E} min</td></tr>`;
+
+if(state.started && !state.submitted){
+  el("studentName").value = state.name;
+  el("studentId").value = state.sid;
+}
+
+el("startBtn").addEventListener("click", ()=>{
+  const name = el("studentName").value.trim();
+  const sid = el("studentId").value.trim();
+  if(!name || !sid){ alert("Please enter your name and student ID before starting."); return; }
+  state.name = name; state.sid = sid;
+  if(!state.started){
+    state.started = true;
+    state.activeSection = "A";
+    state.sectionStartTime = Date.now();
+    state.currentTab = "A";
+    const built = buildPerStudentOrder();
+    state.order = built.order;
+    state.optOrder = built.optOrder;
+  }
+  saveState();
+  requestFullscreenBestEffort();
+  showExam();
+});
+
+// ---------- Fullscreen enforcement + tab-switch logging (evidence, not a hard block) ----------
+function requestFullscreenBestEffort(){
+  try{
+    const el2 = document.documentElement;
+    const req = el2.requestFullscreen || el2.webkitRequestFullscreen || el2.msRequestFullscreen;
+    if(req) req.call(el2).catch(()=>{});
+  }catch(e){}
+}
+function inFullscreen(){
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+}
+function examInProgress(){
+  return state.started && !state.submitted;
+}
+function logViolation(type){
+  if(!examInProgress()) return;
+  state.violations.log.push({type, section: state.activeSection, at: new Date().toISOString()});
+  if(type==="fullscreen_exit") state.violations.fullscreenExits++;
+  if(type==="tab_switch") state.violations.tabSwitches++;
+  if(type==="window_blur") state.violations.windowBlurs++;
+  saveState();
+  updateIntegrityBadge();
+}
+function updateIntegrityBadge(){
+  const badge = el("integrityBadge");
+  if(!badge) return;
+  const v = state.violations;
+  const total = v.fullscreenExits + v.tabSwitches;
+  badge.textContent = total>0 ? `⚠ ${total} integrity signal${total>1?'s':''} logged` : "";
+}
+document.addEventListener("fullscreenchange", ()=>{
+  if(examInProgress() && !inFullscreen()){
+    logViolation("fullscreen_exit");
+    showToast("⚠ You exited fullscreen — this has been logged for your instructor.");
+  }
+});
+document.addEventListener("visibilitychange", ()=>{
+  if(examInProgress() && document.hidden){
+    logViolation("tab_switch");
+    showToast("⚠ Tab/window switch detected — this has been logged for your instructor.");
+  }
+});
+window.addEventListener("blur", ()=>{
+  if(examInProgress() && !document.hidden){
+    logViolation("window_blur");
+  }
+});
+document.addEventListener("copy", e=>{ if(examInProgress()) e.preventDefault(); });
+document.addEventListener("cut", e=>{ if(examInProgress()) e.preventDefault(); });
+document.addEventListener("paste", e=>{ if(examInProgress()) e.preventDefault(); });
+
+// ---------- Resume on load / catch up expired sections ----------
+// Returns true if the exam ended up fully submitted as a result.
+function catchUpSections(){
+  let changed = false;
+  while(!state.submitted){
+    const key = state.activeSection;
+    const budgetMs = (SECTION_MIN[key]||10)*60000;
+    const elapsed = Date.now() - state.sectionStartTime;
+    if(elapsed < budgetMs) break;
+    state.lockedSections[key] = true;
+    const idx = TABS.indexOf(key);
+    if(idx === TABS.length-1){
+      doSubmit(true);
+      return true;
+    }
+    state.activeSection = TABS[idx+1];
+    state.sectionStartTime += budgetMs;
+    changed = true;
+  }
+  if(changed){ state.currentTab = state.activeSection; saveState(); }
+  return false;
+}
+
+function boot(){
+  if(state.submitted){ showResults(); return; }
+  if(state.started){
+    if(catchUpSections()) return;
+    showExam();
+  }
+}
+
+// ---------- Exam screen ----------
+function showExam(){
+  el("startScreen").classList.add("hidden");
+  el("resultsScreen").classList.add("hidden");
+  el("examScreen").classList.remove("hidden");
+  renderTabs();
+  renderSection(state.currentTab || state.activeSection);
+  startTimerLoop();
+  updateIntegrityBadge();
+}
+
+function renderTabs(){
+  const activeIdx = TABS.indexOf(state.activeSection);
+  el("tabs").innerHTML = TABS.map((t,i)=>{
+    const locked = !!state.lockedSections[t];
+    const future = i>activeIdx;
+    const cls = [t===state.currentTab?'active':'', locked?'locked':'', future?'future':''].join(' ');
+    const icon = locked ? '🔒 ' : '';
+    return `<div class="tab ${cls}" data-tab="${t}" data-disabled="${future?'1':''}"><span class="dot"></span>${icon}${TAB_LABELS[t]}<span class="mins">${SECTION_MIN[t]}m</span></div>`;
+  }).join("");
+  el("tabs").querySelectorAll(".tab").forEach(node=>{
+    if(node.dataset.disabled==="1") return;
+    node.addEventListener("click", ()=>{
+      state.currentTab = node.dataset.tab; saveState();
+      renderTabs(); renderSection(state.currentTab);
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const total = EXAM.A.length+EXAM.B.length+EXAM.C.set1.terms.length+EXAM.C.set2.terms.length+EXAM.D.length+EXAM.E.length;
+  let done = Object.keys(state.answers.A).length + Object.keys(state.answers.B).length
+    + Object.keys(state.answers.C1).length + Object.keys(state.answers.C2).length
+    + Object.keys(state.answers.D).length + Object.keys(state.answers.E).length;
+  el("progInner").style.width = Math.round(done/total*100)+"%";
+}
+
+function renderSection(tab){
+  state.currentTab = tab;
+  const locked = !!state.lockedSections[tab];
+  const card = el("sectionCard");
+  const titles = {A:"Section A — Multiple Choice",B:"Section B — True / False",C:"Section C — Matching",D:"Section D — Fill in the Blank",E:"Section E — Short Answer"};
+  let body = "";
+  if(tab==="A") body = state.order.A.map(i=>EXAM.A[i]).map((r,idx)=>renderMCQ(r,locked,idx)).join("");
+  if(tab==="B") body = state.order.B.map(i=>EXAM.B[i]).map((r,idx)=>renderTF(r,locked,idx)).join("");
+  if(tab==="C") body = renderMatching(locked);
+  if(tab==="D") body = state.order.D.map(i=>EXAM.D[i]).map((r,idx)=>renderFIB(r,locked,idx)).join("");
+  if(tab==="E") body = state.order.E.map(i=>EXAM.E[i]).map((r,idx)=>renderSA(r,locked,idx)).join("");
+
+  const banner = locked
+    ? `<div class="section-banner">🔒 This section is locked — showing your submitted answers. <button class="btn secondary" id="backToActiveBtn">Back to current section →</button></div>`
+    : "";
+  card.innerHTML = `<h2>${titles[tab]}</h2>${banner}${body}`;
+  if(locked){
+    el("backToActiveBtn").addEventListener("click", ()=>{
+      state.currentTab = state.activeSection; saveState();
+      renderTabs(); renderSection(state.currentTab);
+      window.scrollTo({top:0,behavior:"smooth"});
+    });
+  } else {
+    wireSectionEvents(tab);
+  }
+  renderFoot(tab, locked);
+  renderTabs();
+}
+
+function renderFoot(tab, locked){
+  const foot = el("footArea");
+  if(locked){
+    foot.innerHTML = "";
+    return;
+  }
+  const isLast = TABS.indexOf(tab)===TABS.length-1;
+  if(!isLast){
+    foot.innerHTML = `<div class="card center"><p class="muted">Once you move to the next section, you can't come back and change these answers.</p>
+      <button class="btn block" id="nextSectionBtn">Finish Section ${tab} → Move to Section ${TABS[TABS.indexOf(tab)+1]}</button></div>`;
+    el("nextSectionBtn").addEventListener("click", ()=> advanceSection(false));
+  } else {
+    foot.innerHTML = `<div class="card center"><p class="muted">When you're done, review your answers above, then submit the whole exam.</p>
+      <button class="btn" id="submitBtn" style="background:var(--bad)">Submit Exam</button></div>`;
+    el("submitBtn").addEventListener("click", ()=>{
+      const total = EXAM.E.length;
+      const done = Object.keys(state.answers.E).length;
+      const msg = done<total ? `You've answered ${done} of ${total} Section E questions. Submit anyway?` : "Submit your exam now? This cannot be undone.";
+      if(confirm(msg)) doSubmit(false);
+    });
+  }
+}
+
+function advanceSection(auto){
+  const key = state.activeSection;
+  if(!auto){
+    const cnt = sectionAnsweredCount(key), tot = sectionTotalCount(key);
+    if(!confirm(`You've answered ${cnt} of ${tot} in Section ${key}. Move on? You won't be able to come back and change these answers.`)) return;
+  }
+  state.lockedSections[key] = true;
+  const idx = TABS.indexOf(key);
+  if(idx===TABS.length-1){ doSubmit(auto); return; }
+  state.activeSection = TABS[idx+1];
+  state.sectionStartTime = Date.now();
+  state.currentTab = state.activeSection;
+  saveState();
+  if(auto) showToast(`Time's up for Section ${key} — moving to Section ${state.activeSection}.`);
+  renderTabs(); renderSection(state.currentTab);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function sectionAnsweredCount(t){
+  if(t==="A") return Object.keys(state.answers.A).length;
+  if(t==="B") return Object.keys(state.answers.B).length;
+  if(t==="C") return Object.keys(state.answers.C1).length+Object.keys(state.answers.C2).length;
+  if(t==="D") return Object.keys(state.answers.D).length;
+  if(t==="E") return Object.keys(state.answers.E).length;
+}
+function sectionTotalCount(t){
+  if(t==="A") return EXAM.A.length;
+  if(t==="B") return EXAM.B.length;
+  if(t==="C") return EXAM.C.set1.terms.length+EXAM.C.set2.terms.length;
+  if(t==="D") return EXAM.D.length;
+  if(t==="E") return EXAM.E.length;
+}
+
+function renderMCQ(row, locked, idx){
+  const [n,text,opts] = row;
+  const chosen = state.answers.A[n];
+  const dispOrder = state.optOrder.A[n]; // array of original option indices, in display order
+  const collapsed = !locked && chosen!==undefined && !expandedA.has(n);
+  const label = "Q"+(idx+1);
+  if(collapsed){
+    return `<div class="q-collapsed" data-n="${n}"><div class="q-num">${label}</div><div class="q-collapsed-text">${esc(text)}</div><div class="q-collapsed-ans">${esc(opts[chosen])}</div><button class="edit-btn" data-editn="${n}">Edit</button></div>`;
+  }
+  if(locked && chosen!==undefined){
+    return `<div class="q-collapsed" data-n="${n}"><div class="q-num">${label}</div><div class="q-collapsed-text">${esc(text)}</div><div class="q-collapsed-ans">${esc(opts[chosen])}</div></div>`;
+  }
+  const optsHtml = dispOrder.map((origIdx,pos)=>{
+    const letter = String.fromCharCode(65+pos);
+    return `<label class="opt ${chosen===origIdx?'selected':''} ${locked?'disabled':''}"><input type="radio" name="A${n}" value="${origIdx}" ${chosen===origIdx?'checked':''} ${locked?'disabled':''}><span>${letter}. ${esc(opts[origIdx])}</span></label>`;
+  }).join("");
+  return `<div class="q"><div class="q-num">${label}</div><div class="q-text">${esc(text)}</div>${optsHtml}</div>`;
+}
+function renderTF(row, locked, idx){
+  const [n,text] = row;
+  const chosen = state.answers.B[n];
+  const swap = !!state.optOrder.B[n];
+  const trueBtn = `<label class="opt ${chosen===true?'selected':''} ${locked?'disabled':''}"><input type="radio" name="B${n}" value="true" ${chosen===true?'checked':''} ${locked?'disabled':''}> True</label>`;
+  const falseBtn = `<label class="opt ${chosen===false?'selected':''} ${locked?'disabled':''}"><input type="radio" name="B${n}" value="false" ${chosen===false?'checked':''} ${locked?'disabled':''}> False</label>`;
+  return `<div class="q"><div class="q-num">Q${idx+1}</div><div class="q-text">${esc(text)}</div>
+    <div class="tf-row">${swap? falseBtn+trueBtn : trueBtn+falseBtn}</div>
+  </div>`;
+}
+function renderMatching(locked){
+  function block(setKey, data, ansKey, termOrderKey, optOrderKey){
+    const optOrder = state.order[optOrderKey]; // original option indices, in display order
+    const bList = optOrder.map((origIdx,pos)=>`<div class="match-b-item"><b>${String.fromCharCode(97+pos)}.</b>${esc(data.options[origIdx])}</div>`).join("");
+    const termOrder = state.order[termOrderKey];
+    const aList = termOrder.map((ti,pos)=>{
+      const t = data.terms[ti];
+      const [n,term] = t;
+      const chosenOrig = state.answers[ansKey][n]; // original option index
+      const dispPos = chosenOrig===undefined ? -1 : optOrder.indexOf(chosenOrig);
+      const letterVal = dispPos===-1 ? "" : String.fromCharCode(97+dispPos);
+      return `<div class="match-a-row"><input type="text" maxlength="1" class="match-blank ${letterVal?'filled':''}" data-set="${ansKey}" data-n="${n}" data-optorderkey="${optOrderKey}" value="${letterVal}" placeholder="_" autocomplete="off" ${locked?'disabled':''}><span>${pos+1}. ${esc(term)}</span></div>`;
+    }).join("");
+    return `<h3 style="font-size:14px;margin:18px 0 8px">${esc(data.title)}</h3>
+      <p class="muted" style="margin-top:-4px">Write the matching letter from Column B in the blank next to each item in Column A.</p>
+      <div class="match-grid">
+        <div class="match-col"><div class="match-col-title">Column A</div>${aList}</div>
+        <div class="match-col"><div class="match-col-title">Column B</div>${bList}</div>
+      </div>`;
+  }
+  return block("set1", EXAM.C.set1, "C1", "C1terms", "C1opts") + block("set2", EXAM.C.set2, "C2", "C2terms", "C2opts");
+}
+function renderFIB(row, locked, idx){
+  const [n,text] = row;
+  const val = state.answers.D[n] || "";
+  return `<div class="q"><div class="q-num">Q${idx+1}</div><div class="q-text">${esc(text)}</div>
+    <input type="text" data-n="${n}" class="fib" value="${esc(val)}" placeholder="Your answer" ${locked?'disabled':''}>
+  </div>`;
+}
+function renderSA(row, locked, idx){
+  const [n,text] = row;
+  const val = state.answers.E[n] || "";
+  return `<div class="q"><div class="q-num">Q${idx+1} · 6 pts</div><div class="q-text">${esc(text)}</div>
+    <textarea data-n="${n}" class="sa" placeholder="Write your answer in organized points..." ${locked?'disabled':''}>${esc(val)}</textarea>
+  </div>`;
+}
+
+function wireSectionEvents(tab){
+  if(tab==="A"){
+    el("sectionCard").querySelectorAll('input[type=radio]').forEach(r=>{
+      r.addEventListener("change", e=>{
+        const n = parseInt(e.target.name.slice(1),10);
+        state.answers.A[n] = parseInt(e.target.value,10);
+        expandedA.delete(n);
+        saveState(); renderSection("A");
+      });
+    });
+    el("sectionCard").querySelectorAll('.edit-btn').forEach(b=>{
+      b.addEventListener("click", e=>{
+        expandedA.add(parseInt(e.target.dataset.editn,10));
+        renderSection("A");
+      });
+    });
+  }
+  if(tab==="B"){
+    el("sectionCard").querySelectorAll('input[type=radio]').forEach(r=>{
+      r.addEventListener("change", e=>{
+        const n = parseInt(e.target.name.slice(1),10);
+        state.answers.B[n] = (e.target.value==="true");
+        saveState(); renderSection("B");
+      });
+    });
+  }
+  if(tab==="C"){
+    el("sectionCard").querySelectorAll('.match-blank').forEach(inp=>{
+      inp.addEventListener("input", e=>{
+        const setKey = e.target.dataset.set, n = parseInt(e.target.dataset.n,10);
+        const optOrderKey = e.target.dataset.optorderkey;
+        let v = e.target.value.toLowerCase().replace(/[^a-j]/g,"");
+        v = v.slice(-1);
+        e.target.value = v;
+        e.target.classList.toggle("filled", !!v);
+        if(v){
+          const dispPos = v.charCodeAt(0)-97;
+          state.answers[setKey][n] = state.order[optOrderKey][dispPos];
+        } else {
+          delete state.answers[setKey][n];
+        }
+        saveState(); updateProgress(); renderTabs();
+      });
+      inp.addEventListener("focus", e=>e.target.select());
+    });
+  }
+  if(tab==="D"){
+    el("sectionCard").querySelectorAll('.fib').forEach(inp=>{
+      inp.addEventListener("input", e=>{
+        const n = parseInt(e.target.dataset.n,10);
+        const v = e.target.value;
+        if(v.trim()==="") delete state.answers.D[n]; else state.answers.D[n]=v;
+        saveState(); updateProgress(); renderTabs();
+      });
+    });
+  }
+  if(tab==="E"){
+    el("sectionCard").querySelectorAll('.sa').forEach(ta=>{
+      ta.addEventListener("input", e=>{
+        const n = parseInt(e.target.dataset.n,10);
+        const v = e.target.value;
+        if(v.trim()==="") delete state.answers.E[n]; else state.answers.E[n]=v;
+        saveState(); updateProgress(); renderTabs();
+      });
+    });
+  }
+}
+
+// ---------- Timer (per-section) ----------
+let timerHandle=null;
+function startTimerLoop(){
+  if(timerHandle) clearInterval(timerHandle);
+  tickTimer();
+  timerHandle = setInterval(tickTimer, 1000);
+}
+function tickTimer(){
+  if(state.submitted){ clearInterval(timerHandle); return; }
+  const key = state.activeSection;
+  const budgetMs = (SECTION_MIN[key]||10)*60000;
+  const remain = Math.max(0, budgetMs - (Date.now()-state.sectionStartTime));
+  const s = Math.floor(remain/1000);
+  const hh = String(Math.floor(s/3600)).padStart(2,"0");
+  const mm = String(Math.floor((s%3600)/60)).padStart(2,"0");
+  const ss = String(s%60).padStart(2,"0");
+  const box = el("timerBox");
+  box.textContent = hh+":"+mm+":"+ss;
+  box.classList.toggle("warn", remain<2*60000 && remain>=30000);
+  box.classList.toggle("bad", remain<30000);
+  el("timerLabel").textContent = "Time left — Section " + key;
+  if(remain<=0){
+    advanceSection(true);
+  }
+}
+
+// ---------- Grading ----------
+function doSubmit(timedOut){
+  if(state.submitted) { showResults(); return; }
+  state.submitted = true;
+  state.timedOut = !!timedOut;
+  state.submitTime = Date.now();
+  state.graded = grade();
+  saveState();
+  if(timerHandle) clearInterval(timerHandle);
+  showResults();
+}
+
+function normalize(s){ return String(s||"").trim().toLowerCase().replace(/\s+/g," "); }
+
+function grade(){
+  let scoreA=0, scoreB=0, scoreC=0, scoreD=0, scoreE=0;
+  EXAM.A.forEach(([n,,,correct])=>{ if(state.answers.A[n]===correct) scoreA++; });
+  EXAM.B.forEach(([n,,correct])=>{ if(state.answers.B[n]===correct) scoreB++; });
+  EXAM.C.set1.terms.forEach(([n,,correct])=>{ if(state.answers.C1[n]===correct) scoreC++; });
+  EXAM.C.set2.terms.forEach(([n,,correct])=>{ if(state.answers.C2[n]===correct) scoreC++; });
+  EXAM.D.forEach(([n,,answer,,alts])=>{
+    const given = normalize(state.answers.D[n]);
+    const accepted = [answer, ...(alts||[])].map(normalize);
+    if(given && accepted.includes(given)) scoreD++;
+  });
+  const eReview = EXAM.E.map(([n,prompt,points])=>{
+    const given = normalize(state.answers.E[n]);
+    const matched = points.map(([text,kws])=> given && kws.some(k=>given.includes(normalize(k))) );
+    const matchedCount = matched.filter(Boolean).length;
+    scoreE += matchedCount;
+    return {n, prompt, points, matched, matchedCount, answer: state.answers.E[n]||""};
+  });
+  return {scoreA, scoreB, scoreC, scoreD, scoreE, eReview,
+    totalObjective: scoreA+scoreB+scoreC+scoreD,
+    totalSuggested: scoreA+scoreB+scoreC+scoreD+scoreE};
+}
+
+// ---------- Results screen ----------
+function showResults(){
+  el("startScreen").classList.add("hidden");
+  el("examScreen").classList.add("hidden");
+  el("resultsScreen").classList.remove("hidden");
+  el("progInner").style.width="100%";
+  const g = state.graded;
+  el("resultsWho").textContent = `${state.name} · ID ${state.sid}` + (state.timedOut? " · Auto-submitted (time expired)":"");
+  el("scoreGrid").innerHTML = `
+    <div class="score-box"><div class="n">${g.scoreA}/${EXAM.A.length}</div><div class="l">A · MCQ</div></div>
+    <div class="score-box"><div class="n">${g.scoreB}/${EXAM.B.length}</div><div class="l">B · True/False</div></div>
+    <div class="score-box"><div class="n">${g.scoreC}/${EXAM.C.set1.terms.length+EXAM.C.set2.terms.length}</div><div class="l">C · Matching</div></div>
+    <div class="score-box"><div class="n">${g.scoreD}/${EXAM.D.length}</div><div class="l">D · Fill Blank</div></div>
+    <div class="score-box"><div class="n">${g.scoreE}/${EXAM.E.length*6}</div><div class="l">E · Short Answer (suggested)</div></div>
+    <div class="score-box" style="border-color:var(--accent)"><div class="n">${g.totalSuggested}/${EXAM.meta.totalPoints}</div><div class="l">Suggested Total</div></div>
+  `;
+  el("resultsNote").textContent = `Sections A–D (${g.totalObjective}/${EXAM.meta.totalPoints-EXAM.E.length*6} pts) are auto-graded exactly. Section E (${g.scoreE}/${EXAM.E.length*6} pts) is a rough keyword-based suggestion only — the instructor should review the written answers below before finalizing the grade.`;
+  const v = state.violations || {fullscreenExits:0, tabSwitches:0, windowBlurs:0, log:[]};
+  const totalSignals = v.fullscreenExits + v.tabSwitches + v.windowBlurs;
+  el("integritySummary").textContent = totalSignals===0
+    ? "No fullscreen exits or tab/window switches were detected during this exam."
+    : `${v.fullscreenExits} fullscreen exit(s), ${v.tabSwitches} tab/window switch(es), ${v.windowBlurs} window-focus loss(es) detected. This is a signal for review, not proof of misconduct.`;
+  el("integrityLog").innerHTML = v.log.length ? `<table class="simple"><tr><th>Type</th><th>Section</th><th>Time</th></tr>${
+    v.log.map(l=>`<tr><td>${esc(l.type)}</td><td>${esc(l.section)}</td><td>${new Date(l.at).toLocaleTimeString()}</td></tr>`).join("")
+  }</table>` : "";
+  el("reviewE").innerHTML = g.eReview.map(r=>`
+    <div class="review-item">
+      <div><strong>Q${r.n}</strong> — suggested ${r.matchedCount}/6 <span class="badge ${r.matchedCount>=5?'ok':r.matchedCount>=3?'mid':'no'}">${r.matchedCount>=5?'looks complete':r.matchedCount>=3?'partial':'needs review'}</span></div>
+      <div class="muted" style="margin:6px 0">${esc(r.prompt)}</div>
+      <div style="white-space:pre-wrap;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px;margin:6px 0;font-size:13px">${esc(r.answer)||'<em>(no answer)</em>'}</div>
+      <div class="small">Points detected: ${r.points.map((p,i)=>`<span class="badge ${r.matched[i]?'ok':'no'}" style="margin:2px">${i+1}</span>`).join("")}</div>
+    </div>
+  `).join("");
+}
+
+el("downloadBtn").addEventListener("click", ()=>{
+  const g = state.graded;
+  const v = state.violations || {fullscreenExits:0, tabSwitches:0, windowBlurs:0, log:[]};
+  const report = {
+    exam: EXAM.meta.title,
+    student: {name: state.name, id: state.sid},
+    submittedAt: new Date(state.submitTime).toISOString(),
+    timedOut: !!state.timedOut,
+    scores: {A:g.scoreA, B:g.scoreB, C:g.scoreC, D:g.scoreD, E_suggested:g.scoreE,
+      objectiveTotal:g.totalObjective, suggestedTotal:g.totalSuggested, maxTotal:EXAM.meta.totalPoints},
+    answers: state.answers,
+    sectionE_review: g.eReview.map(r=>({q:r.n, answer:r.answer, suggestedScore:r.matchedCount, pointsMatched:r.matched})),
+    integrity: {fullscreenExits:v.fullscreenExits, tabSwitches:v.tabSwitches, windowBlurs:v.windowBlurs, log:v.log}
+  };
+  const blob = new Blob([JSON.stringify(report,null,2)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `exam_result_${state.sid||"student"}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+});
+el("printBtn").addEventListener("click", ()=> window.print());
+
+boot();
+</script>
+</body>
+</html>
